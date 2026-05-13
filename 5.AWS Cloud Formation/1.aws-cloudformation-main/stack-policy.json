@@ -1,0 +1,15 @@
+{
+
+    "Statement": [
+
+        {
+            "Effect": "Deny",
+            "Action": "Update:*",
+            "Principal": "*",
+            "Resource": "LogicalResourceId/MyBucket"
+
+        }
+
+    ]
+
+}

@@ -1,0 +1,22 @@
+aws learning notes
+
+Public-Private Architecture Project Demo
+
+scp cmd :
+
+	scp -i /Users/syed-22138/Downloads/aws-login.pem \
+	/Users/syed-22138/Downloads/aws-login-pem.pem \
+	ubuntu@44.214.178.87:/home/ubuntu/
+
+python application running :
+
+	python3 -m http.server 8000
+
+ALB --> App1 / App2 :
+
+	Application load balancer should be created in VPC, and it should be on public subnets. 
+
+	And the application is load balance port is 80. 
+
+	First, create the target group, and then we can create the application load balancer, and for that load balancer, we can attach to the target group which we have created earlier. By this, we can avoid mistakes. 
+

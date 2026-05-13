@@ -1,0 +1,68 @@
+Metadata:
+  Purpose: Basic EC2 instance with HTTP and SSH access
+
+Mappings:
+  RegionMap:
+    us-east-2:
+      AMI: ami-0eb9d6fc9fab44d24
+    eu-west-1:
+      AMI: ami-0b3e7dd7b2a99b08d
+    us-east-1:
+      AMI: ami-0150ccaf51ab55a51
+
+Parameters:
+  MyInstanceType:
+    Type: String
+    Description: Select your EC2 instance type
+    AllowedValues:
+      - t3.micro
+      - t3.small
+  MyVPC:
+    Type: AWS::EC2::VPC::Id
+    Description: Select the VPC to launch the EC2 instance in
+
+
+Resources:
+  MyInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref MyInstanceType
+      ImageId: !FindInMap [RegionMap, !Ref "AWS::Region", AMI]
+      SecurityGroupIds:
+        - !Ref MySecurityGroup
+      Tags:
+        - Key: Name
+          Value: SimpleWebServer
+      UserData:
+        Fn::Base64: |
+          #!/bin/bash
+          yum update -y
+          yum install -y httpd
+          systemctl start httpd
+          systemctl enable httpd
+
+
+  MySecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow HTTP and SSH access
+      VpcId: !Ref MyVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+
+Outputs:
+
+  InstanceId:
+    Description: The EC2 instance ID
+    Value: !Ref MyInstance
+
+  InstancePublicIP:
+    Description: The public IP address of the EC2 instance
+    Value: !GetAtt MyInstance.PublicIp

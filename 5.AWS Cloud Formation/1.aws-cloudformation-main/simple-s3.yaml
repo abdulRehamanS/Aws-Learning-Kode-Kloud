@@ -1,0 +1,9 @@
+Resources:
+  MyBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      Tags:
+        - Key: Developer
+          Value: John
+        - Key: Status
+          Value: Active

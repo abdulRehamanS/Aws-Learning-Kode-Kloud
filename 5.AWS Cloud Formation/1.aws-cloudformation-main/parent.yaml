@@ -1,0 +1,10 @@
+Resources:
+  S3Stack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://eden-kodekloud-lkjo-bkt-templates.s3.us-east-2.amazonaws.com/simple-s3.yaml
+
+  EC2Stack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://eden-kodekloud-lkjo-bkt-templates.s3.us-east-2.amazonaws.com/simple-ec2.yaml

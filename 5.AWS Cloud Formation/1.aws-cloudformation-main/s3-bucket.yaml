@@ -1,0 +1,81 @@
+Mappings:
+  DevMap:
+    Arno:
+      Field: Quality assurance
+      Env: Testing/development
+    Alice:
+      Field: Backend developer
+      Env: Production
+
+Parameters:
+  InputBucketName:
+    Type: String
+    Description: Please enter in your desired s3 bucket name
+  InputDeveloperName:
+    Type: String
+    AllowedValues:
+      - Arno
+      - Alice
+
+Conditions:
+  IsProd: !Equals
+    - !FindInMap [DevMap, !Ref InputDeveloperName, Env]
+    - "Production"
+
+Resources:
+  MyS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref InputBucketName
+      Tags:
+        - Key: Developer
+          Value: !Ref InputDeveloperName
+        - Key: Environment
+          Value: !FindInMap [DevMap, !Ref InputDeveloperName, Env]
+        - Key: Profession
+          Value: !FindInMap [DevMap, !Ref InputDeveloperName, Field]
+        - Key: Status
+          Value: "In-operation"
+
+      PublicAccessBlockConfiguration: !If
+        - IsProd
+        -
+          BlockPublicAcls: false
+          BlockPublicPolicy: false
+          IgnorePublicAcls: false
+          RestrictPublicBuckets: false
+        -
+          BlockPublicAcls: true
+          BlockPublicPolicy: true
+          IgnorePublicAcls: true
+          RestrictPublicBuckets: true
+
+    Metadata:
+      Purpose: "Creating an s3 bucket"
+      Reviewed: "02-07-2025"
+      Owner: "John Doe"
+      Contact: "johndoe@mail.com"
+
+  MyPublicReadPolicy:
+    Condition: IsProd
+    DependsOn: MyS3Bucket
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref InputBucketName
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal: "*"
+            Action: "s3:GetObject"
+            Resource: !Sub "arn:aws:s3:::${InputBucketName}/*"
+
+Outputs:
+
+  BucketArn:
+    Description: "ARN of the S3 bucket"
+    Value: !GetAtt MyS3Bucket.Arn
+
+  DeveloperBucketLabel:
+    Description: "Label combining developer name and bucket name"
+    Value: !Join [ " - ", [ !Ref InputDeveloperName, !Ref InputBucketName ] ]
